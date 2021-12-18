@@ -43,7 +43,7 @@ Copy `npiperelay.exe` to a location on your path. WSL 2 will read your path and 
 Once you have Go installed (and your GOPATH configured), you need to download and install the tool. This is a little tricky because we are building the tool for Windows from WSL:
 
 ```bash
-$ go get -d github.com/jstarks/npiperelay
+$ GOOS=windows go get -d github.com/jstarks/npiperelay
 $ GOOS=windows go build -o /mnt/c/Users/<myuser>/go/bin/npiperelay.exe github.com/jstarks/npiperelay
 ```
 
