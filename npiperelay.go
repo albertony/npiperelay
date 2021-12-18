@@ -12,10 +12,11 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+const cERROR_PIPE_BUSY syscall.Errno = 231
 const cERROR_PIPE_NOT_CONNECTED syscall.Errno = 233
 
 var (
-	poll            = flag.Bool("p", false, "poll until the the named pipe exists")
+	poll            = flag.Bool("p", false, "poll until the the named pipe exists and is not busy")
 	closeWrite      = flag.Bool("s", false, "send a 0-byte message to the pipe after EOF on stdin")
 	closeOnEOF      = flag.Bool("ep", false, "terminate on EOF reading from the pipe, even if there is more data to write")
 	closeOnStdinEOF = flag.Bool("ei", false, "terminate on EOF reading from stdin, even if there is more data to write")
@@ -33,6 +34,10 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 			return newOverlappedFile(h), nil
 		}
 		if poll && os.IsNotExist(err) {
+			time.Sleep(200 * time.Millisecond)
+			continue
+		}
+		if poll && err == cERROR_PIPE_BUSY {
 			time.Sleep(200 * time.Millisecond)
 			continue
 		}
