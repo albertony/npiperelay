@@ -16,19 +16,26 @@ Let me know on Twitter ([@gigastarks](https://twitter.com/gigastarks)) if you co
 
 # Installation
 
-Binaries for npiperelay are not currently available. You have to build from source. With Go, this is not too difficult.
+Binaries for npiperelay are available [here](https://github.com/jstarks/npiperelay/releases).
+Extract `npiperelay.exe` from a release archive, and [put it in a location in your PATH](#adding-to-path).
 
-Basic steps:
+You can also build from source. With Go, this is not too difficult:
+- [Install Go](#installing-go).
+- [Download and build](#building) the Windows binary
+- [Add it to your PATH](#adding-to-path).
 
-1. Install Go.
-2. Download and build the Windows binary and add it to your path.
-3. Install socat.
+Next, you typically need to [install socat](#installing-socat).
 
 ## Installing Go
 
-To build the binary, you will need a version of [Go](https://golang.org). You can use a Windows build of Go or, as outlined here, you can use a Linux build and cross-compile the Windows binary directly from WSL.
+To build the binary, you will need a version of [Go](https://golang.org).
 
-## Building on Windows
+## Building
+
+You can use a Windows build of Go or you can use a Linux build and cross-compile
+the Windows binary directly from WSL.
+
+### Building on Windows
 
 ```powershell
 git clone https://github.com/jstarks/npiperelay.git
@@ -38,7 +45,7 @@ go build -o npiperelay.exe
 
 Copy `npiperelay.exe` to a location on your path. WSL 2 will read your path and find it.
 
-## Building npiperelay.exe in WSL
+### Building in WSL
 
 Once you have Go installed (and your GOPATH configured), you need to download and install the tool. This is a little tricky because we are building the tool for Windows from WSL:
 
@@ -46,6 +53,8 @@ Once you have Go installed (and your GOPATH configured), you need to download an
 $ GOOS=windows go get -d github.com/jstarks/npiperelay
 $ GOOS=windows go build -o /mnt/c/Users/<myuser>/go/bin/npiperelay.exe github.com/jstarks/npiperelay
 ```
+
+### Adding to PATH
 
 In this example, we have put the binary in `/mnt/c/Users/<myuser>/go/bin`. We then need to make sure that this directory is available in the WSL path. This can be achieved either by adding C:\Users\<myuser>\go\bin to the Win32 path and restarting WSL, or by just adding the path directly in WSL via the command line or in our `.bash_profile` or `.bashrc`.
 
