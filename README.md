@@ -16,70 +16,104 @@ Let me know on Twitter ([@gigastarks](https://twitter.com/gigastarks)) if you co
 
 # Installation
 
-Binaries for npiperelay are available [here](https://github.com/jstarks/npiperelay/releases).
-Extract `npiperelay.exe` from a release archive, and [put it in a location in your PATH](#adding-to-path).
+npiperelay is a Go program and comes as a single executable file; `npiperelay.exe`.
+The [releases](https://github.com/jstarks/npiperelay/releases) include pre-built
+executable, ready to use. To install, download zip archive from
+[latest release](https://github.com/jstarks/npiperelay/releases), and simply extract
+it into a location of your choosing.
 
-You can also build from source. With Go, this is not too difficult:
-- [Install Go](#installing-go).
-- [Download and build](#building) the Windows binary
-- [Add it to your PATH](#adding-to-path).
+In most cases, as with the [usage examples](#usage) below, you need to do
+some additional steps in WSL:
+- [Make npiperelay available from PATH](#adding-to-path)
+- [Install socat](#installing-socat)
 
-Next, you typically need to [install socat](#installing-socat).
+## Adding to PATH
 
-## Installing Go
-
-To build the binary, you will need a version of [Go](https://golang.org).
-
-## Building
-
-You can use a Windows build of Go or you can use a Linux build and cross-compile
-the Windows binary directly from WSL.
-
-### Building on Windows
-
-```powershell
-git clone https://github.com/jstarks/npiperelay.git
-cd npiperelay
-go build -o npiperelay.exe
-```
-
-Copy `npiperelay.exe` to a location on your path. WSL 2 will read your path and find it.
-
-### Building in WSL
-
-Once you have Go installed (and your GOPATH configured), you need to download and install the tool. This is a little tricky because we are building the tool for Windows from WSL:
+In most cases you need to make sure that the npiperelay executable is available in the WSL path.
+E.g. if you have put it in `/mnt/c/Users/<username>/go/bin`, this can be achieved either by adding
+`C:\Users\<username>\go\bin` to the PATH environment variable in Windows and restarting WSL,
+or by just adding the path directly in WSL via the command line or in our `.bash_profile` or `.bashrc`. Alternatively, you can just symlink it into something that's already in your path:
 
 ```bash
-$ GOOS=windows go get -d github.com/jstarks/npiperelay
-$ GOOS=windows go build -o /mnt/c/Users/<myuser>/go/bin/npiperelay.exe github.com/jstarks/npiperelay
-```
-
-### Adding to PATH
-
-In this example, we have put the binary in `/mnt/c/Users/<myuser>/go/bin`. We then need to make sure that this directory is available in the WSL path. This can be achieved either by adding C:\Users\<myuser>\go\bin to the Win32 path and restarting WSL, or by just adding the path directly in WSL via the command line or in our `.bash_profile` or `.bashrc`.
-
-Or you can just symlink it into something that's already in your path:
-
-```bash
-$ sudo ln -s /mnt/c/Users/<myuser>/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
+$ sudo ln -s /mnt/c/Users/<username>/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
 ```
 
 You may be tempted to just put the real binary directly into `/usr/local/bin`, but this will not work because Windows currently cannot run binaries that exist in the Linux namespace -- they have to reside somewhere under the Windows portion of the file system.
 
 ## Installing socat
 
-For all of the examples below, you will need the excellent `socat` tool. Your WSL distribution should
-have it available; install it by running
+For all of the [usage examples](#usage) below, you will need the excellent `socat` tool.
+Your WSL distribution should have it available; install it by running something along the lines of:
 
 ```bash
 $ sudo apt install socat
 ```
 
-or the equivalent.
+# Building
+
+You can also build from source. With Go, this is not too difficult:
+1. [Install Go](#installing-go)
+2. [Download and build](#downloading-and-building)
+
+Then, consider the same additional steps described for installing releases above:
+- [Make npiperelay available from PATH](#adding-to-path)
+- [Install socat](#installing-socat)
+
+## Installing Go
+
+To build the binary, you will need a version of [Go](https://go.dev).
+
+You can use a Windows build of Go or you can use a Linux build and
+cross-compile the Windows binary from within WSL. To build in WSL
+you can probably install Go from your distro's package manager.
+
+## Downloading and building
+
+With Go there are different alternative methods for building a project.
+In newer versions of Go (version 1.16 and newer) you should preferrable
+use one of the following two.
+
+The first and most preferred alternative is a pure local build, where the
+source will be in subfolder npiperelay of current working directory,
+and resulting executable will be in root of that directory.
+
+```cmd
+git clone https://github.com/jstarks/npiperelay.git
+cd npiperelay
+go build
+```
+
+An optional adjustment to this is to add the go build argument -o followed by
+a custom path where to put the resulting executable, e.g. to put it directly
+into a location already available in [PATH](#adding-to-path).
+
+```cmd
+go build -o C:\bin\npiperelay.exe
+```
+
+The other alternative is a the Go standard method for installing third party
+executables, where both the source and the resulting executable are put in
+standard GOPATH. The result will be at path `%GOPATH%\bin\npiperelay.exe`.
+
+```cmd
+go install github.com/jstarks/npiperelay@latest
+```
+
+As mentioned you can also build from within WSL, using cross-compilation
+to Windows executable. Set variable `GOOS=windows` and use similar commands
+as above, e.g. 
+
+```bash
+git clone https://github.com/jstarks/npiperelay.git
+cd npiperelay
+GOOS=windows go build -o /mnt/c/bin/npiperelay.exe
+```
 
 # Usage
 
-The examples below assume you have copied the contents of the `scripts` directory (from `$HOME/go/src/github.com/jstarks/npiperelay/scripts`) into your PATH somewhere. These scripts are just examples and can be modified to suit your needs.
+The examples below assume you have copied the contents of the `scripts`
+directory into your PATH somewhere. These scripts are just examples and can be
+modified to suit your needs.
 
 ## Connecting to Docker from WSL
 
@@ -236,7 +270,7 @@ Next, run gdb and connect to the serial port:
 
 ```bash
 gdb ./vmlinux
-target remote /home/<myuser>/foo-pty
+target remote /home/<username>/foo-pty
 ```
 
 ## Connect to Windows SSH agent
