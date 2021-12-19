@@ -8,14 +8,13 @@ import (
 	"os"
 	"runtime"
 	"sync"
-	"syscall"
 	"time"
 
 	"golang.org/x/sys/windows"
 )
 
-const cERROR_PIPE_BUSY syscall.Errno = 231
-const cERROR_PIPE_NOT_CONNECTED syscall.Errno = 233
+// How long to sleep between failures while polling
+const pollTimeout = 200 * time.Millisecond
 
 var (
 	poll            = flag.Bool("p", false, "poll until the the named pipe exists and is not busy")
@@ -40,13 +39,15 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 		if err == nil {
 			return newOverlappedFile(h), nil
 		}
-		if poll && os.IsNotExist(err) {
-			time.Sleep(200 * time.Millisecond)
-			continue
-		}
-		if poll && err == cERROR_PIPE_BUSY {
-			time.Sleep(200 * time.Millisecond)
-			continue
+		if poll {
+			if err == windows.ERROR_FILE_NOT_FOUND {
+				time.Sleep(pollTimeout)
+				continue
+			}
+			if err == windows.ERROR_PIPE_BUSY {
+				time.Sleep(pollTimeout)
+				continue
+			}
 		}
 		return nil, &os.PathError{Path: p, Op: "open", Err: err}
 	}
@@ -116,7 +117,7 @@ func main() {
 	}()
 
 	_, err = io.Copy(os.Stdout, conn)
-	if underlyingError(err) == windows.ERROR_BROKEN_PIPE || underlyingError(err) == cERROR_PIPE_NOT_CONNECTED {
+	if underlyingError(err) == windows.ERROR_BROKEN_PIPE || underlyingError(err) == windows.ERROR_PIPE_NOT_CONNECTED {
 		// The named pipe is closed and there is no more data to read. Since
 		// named pipes are not bidirectional, there is no way for the other side
 		// of the pipe to get more data, so do not wait for the stdin copy to
