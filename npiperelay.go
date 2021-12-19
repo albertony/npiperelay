@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -51,13 +52,6 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 		}
 		return nil, &os.PathError{Path: p, Op: "open", Err: err}
 	}
-}
-
-func underlyingError(err error) error {
-	if serr, ok := err.(*os.SyscallError); ok {
-		return serr.Err
-	}
-	return err
 }
 
 func main() {
@@ -117,7 +111,7 @@ func main() {
 	}()
 
 	_, err = io.Copy(os.Stdout, conn)
-	if underlyingError(err) == windows.ERROR_BROKEN_PIPE || underlyingError(err) == windows.ERROR_PIPE_NOT_CONNECTED {
+	if errors.Is(err, windows.ERROR_BROKEN_PIPE) || errors.Is(err, windows.ERROR_PIPE_NOT_CONNECTED) {
 		// The named pipe is closed and there is no more data to read. Since
 		// named pipes are not bidirectional, there is no way for the other side
 		// of the pipe to get more data, so do not wait for the stdin copy to
@@ -144,7 +138,7 @@ func main() {
 		go func() {
 			for {
 				_, err := conn.Read(nil)
-				if underlyingError(err) == windows.ERROR_BROKEN_PIPE {
+				if errors.Is(err, windows.ERROR_BROKEN_PIPE) {
 					if *verbose {
 						log.Println("pipe closed")
 					}
