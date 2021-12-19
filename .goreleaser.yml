@@ -1,3 +1,13 @@
+before:
+  hooks:
+    - 'go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest'
+    - 'goversioninfo
+      -platform-specific
+      -ver-major="{{ .Major }}" -product-ver-major="{{ .Major }}"
+      -ver-minor="{{ .Minor }}" -product-ver-minor="{{ .Minor }}"
+      -ver-patch="{{ .Patch }}" -product-ver-patch="{{ .Patch }}"
+      -file-version="{{ .Version }}+{{ .FullCommit }}" -product-version="{{ .Version }}+{{ .FullCommit }}"'
+
 builds:
 - binary: npiperelay
   goos:

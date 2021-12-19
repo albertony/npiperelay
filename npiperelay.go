@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -21,6 +23,11 @@ var (
 	closeOnEOF      = flag.Bool("ep", false, "terminate on EOF reading from the pipe, even if there is more data to write")
 	closeOnStdinEOF = flag.Bool("ei", false, "terminate on EOF reading from stdin, even if there is more data to write")
 	verbose         = flag.Bool("v", false, "verbose output on stderr")
+
+	version = "0.0.0-dev" // Replaced with value from ldflag in build by GoReleaser: Current Git tag with the v prefix stripped
+	commit  = "unknown"   // Replaced with value from ldflag in build by GoReleaser: Current git commit SHA
+	date    = "unknown"   // Replaced with value from ldflag in build by GoReleaser: Date according RFC3339
+	builtBy = "unknown"   // Replaced with value from ldflag in build by GoReleaser
 )
 
 func dialPipe(p string, poll bool) (*overlappedFile, error) {
@@ -53,6 +60,16 @@ func underlyingError(err error) error {
 }
 
 func main() {
+	flag.Usage = func() {
+		// Custom usage message (default documented here: https://pkg.go.dev/flag#pkg-variables)
+		fmt.Fprintf(flag.CommandLine.Output(), "npiperelay v%s\n", version)
+		fmt.Fprintf(flag.CommandLine.Output(), "  commit %s\n", commit)
+		fmt.Fprintf(flag.CommandLine.Output(), "  build date %s\n", date)
+		fmt.Fprintf(flag.CommandLine.Output(), "  built by %s\n", builtBy)
+		fmt.Fprintf(flag.CommandLine.Output(), "  built with %s\n", runtime.Version())
+		fmt.Fprint(flag.CommandLine.Output(), "\nusage:\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	args := flag.Args()
 	if len(args) != 1 {
