@@ -15,7 +15,11 @@ import (
 )
 
 // How long to sleep between failures while polling
-const pollTimeout = 200 * time.Millisecond
+const (
+	cSECURITY_SQOS_PRESENT = 0x100000
+	cSECURITY_ANONYMOUS    = 0
+	cPOLL_TIMEOUT          = 200 * time.Millisecond
+)
 
 var (
 	poll            = flag.Bool("p", false, "poll until the the named pipe exists and is not busy")
@@ -36,17 +40,17 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 		return nil, err
 	}
 	for {
-		h, err := windows.CreateFile(&p16[0], windows.GENERIC_READ|windows.GENERIC_WRITE, 0, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_OVERLAPPED, 0)
+		h, err := windows.CreateFile(&p16[0], windows.GENERIC_READ|windows.GENERIC_WRITE, 0, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_OVERLAPPED|cSECURITY_SQOS_PRESENT|cSECURITY_ANONYMOUS, 0)
 		if err == nil {
 			return newOverlappedFile(h), nil
 		}
 		if poll {
 			if err == windows.ERROR_FILE_NOT_FOUND {
-				time.Sleep(pollTimeout)
+				time.Sleep(cPOLL_TIMEOUT)
 				continue
 			}
 			if err == windows.ERROR_PIPE_BUSY {
-				time.Sleep(pollTimeout)
+				time.Sleep(cPOLL_TIMEOUT)
 				continue
 			}
 		}
