@@ -1,26 +1,41 @@
 # npiperelay
 
+*Note: This is a fork of [jstarks/npiperelay](https://github.com/jstarks/npiperelay).
+The branch named master is kept "frozen" in sync with upstream, while the branch
+named fork is this project's default branch. The fork branch includes additional
+improvements on top of upstream, though the changes are conservative. The primary
+consern is just to keep the code updated and secure, considering the latest commit
+in upstream is back in mid 2020, relased as version 0.1.0. Releases here in my
+project are created from the fork branch, starting at version number 1.0.0.*
+
 npiperelay is a tool that allows you to access a Windows named pipe in a way
-that is more compatible with a variety of command-line tools. With it, you can
-use Windows named pipes from the Windows Subsystem for Linux (WSL).
+that is more compatible with a variety of command-line tools. With it,
+you can use Windows named pipes from the Windows Subsystem for Linux (WSL).
+Essentially it exposes stdin and stdout to processes in WSL, and relays
+information to a named pipe used by processes running in Windows, typically
+with help of the [socat](#installing-socat) tool in the WSL distro.
 
 For example, you can:
 
-* Connect to Docker for Windows from the Linux Docker client in WSL
-* Connect to MySQL Server running as a Windows service
-* Connect interactively to a Hyper-V Linux VM's serial console
-* Use gdb to connect to debug the kernel of a Hyper-V Linux VM
-* Connect to Windows SSH agent via named pipe
+* Connect a network interface in WSL directly to the host's network device.
+  - This may work around issues with the built-in Hyper-V-based networking
+    in combination with VPN and/or antivirus/firewall software.
+    See my other project [wslkit](https://github.com/albertony/wslkit) for details.
+* Connect to Docker for Windows from the Linux Docker client in WSL.
+* Connect to MySQL Server running as a Windows service.
+* Connect interactively to a Hyper-V Linux VM's serial console.
+* Use gdb to connect to debug the kernel of a Hyper-V Linux VM.
+* Connect to Windows SSH agent via named pipe.
 
-Let me know on Twitter ([@gigastarks](https://twitter.com/gigastarks)) if you come up with more interesting uses.
+See [usage examples](#usage) below for more details.
 
 # Installation
 
 npiperelay is a Go program and comes as a single executable file; `npiperelay.exe`.
-The [releases](https://github.com/jstarks/npiperelay/releases) include pre-built
+The [releases](https://github.com/albertony/npiperelay/releases) include pre-built
 executable, ready to use. To install, download zip archive from
-[latest release](https://github.com/jstarks/npiperelay/releases), and simply extract
-it into a location of your choosing.
+[latest release](https://github.com/albertony/npiperelay/releases/latest),
+and simply extract it into a location of your choosing.
 
 In most cases, as with the [usage examples](#usage) below, you need to do
 some additional steps in WSL:
@@ -38,7 +53,13 @@ or by just adding the path directly in WSL via the command line or in our `.bash
 $ sudo ln -s /mnt/c/Users/<username>/go/bin/npiperelay.exe /usr/local/bin/npiperelay.exe
 ```
 
-You may be tempted to just put the real binary directly into `/usr/local/bin`, but this will not work because Windows currently cannot run binaries that exist in the Linux namespace -- they have to reside somewhere under the Windows portion of the file system.
+You may choose to just put the real binary within the WSL filesystem (e.g. in `/usr/local/bin`),
+which tying the distro installation to a fixed location on host. The original npiperelay readme
+warns that this is not possible, but that was most probably written before
+[interop](https://docs.microsoft.com/en-us/windows/wsl/filesystems#run-windows-tools-from-linux)
+functionality was added to WSL, because as long as the
+[interop setting](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#interop-settings)
+is not disabled it does really work!
 
 ## Installing socat
 
@@ -78,7 +99,7 @@ source will be in subfolder npiperelay of current working directory,
 and resulting executable will be in root of that directory.
 
 ```cmd
-git clone https://github.com/jstarks/npiperelay.git
+git clone https://github.com/albertony/npiperelay.git
 cd npiperelay
 go build
 ```
@@ -96,7 +117,7 @@ executables, where both the source and the resulting executable are put in
 standard GOPATH. The result will be at path `%GOPATH%\bin\npiperelay.exe`.
 
 ```cmd
-go install github.com/jstarks/npiperelay@latest
+go install github.com/albertony/npiperelay@latest
 ```
 
 As mentioned you can also build from within WSL, using cross-compilation
@@ -104,7 +125,7 @@ to Windows executable. Set variable `GOOS=windows` and use similar commands
 as above, e.g. 
 
 ```bash
-git clone https://github.com/jstarks/npiperelay.git
+git clone https://github.com/albertony/npiperelay.git
 cd npiperelay
 GOOS=windows go build -o /mnt/c/bin/npiperelay.exe
 ```
