@@ -1,4 +1,4 @@
-module github.com/jstarks/npiperelay
+module github.com/albertony/npiperelay
 
 go 1.17
 

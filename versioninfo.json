@@ -20,7 +20,7 @@
     },
     "StringFileInfo": {
         "Comments": "",
-        "CompanyName": "https://github.com/jstarks/npiperelay",
+        "CompanyName": "https://github.com/albertony/npiperelay",
         "FileDescription": "Access Windows named pipes from WSL",
         "FileVersion": "0.0.0-dev",
         "InternalName": "npiperelay",
