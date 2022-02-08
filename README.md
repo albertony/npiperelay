@@ -6,7 +6,8 @@ named fork is this project's default branch. The fork branch includes additional
 improvements on top of upstream, though the changes are conservative. The primary
 consern is just to keep the code updated and secure, considering the latest commit
 in upstream is back in mid 2020, relased as version 0.1.0. Releases here in my
-project are created from the fork branch, starting at version number 1.0.0.*
+project are created from the fork branch, starting at version number 1.0.0.
+See [/releases](releases) for details.*
 
 npiperelay is a tool that allows you to access a Windows named pipe in a way
 that is more compatible with a variety of command-line tools. With it,
