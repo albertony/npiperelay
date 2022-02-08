@@ -26,6 +26,7 @@ var (
 	closeWrite      = flag.Bool("s", false, "send a 0-byte message to the pipe after EOF on stdin")
 	closeOnEOF      = flag.Bool("ep", false, "terminate on EOF reading from the pipe, even if there is more data to write")
 	closeOnStdinEOF = flag.Bool("ei", false, "terminate on EOF reading from stdin, even if there is more data to write")
+	runInBackground = flag.Bool("bg", false, "hide console window and run in background")
 	verbose         = flag.Bool("v", false, "verbose output on stderr")
 
 	version = "0.0.0-dev" // Replaced with value from ldflag in build by GoReleaser: Current Git tag with the v prefix stripped
@@ -33,6 +34,17 @@ var (
 	date    = "unknown"   // Replaced with value from ldflag in build by GoReleaser: Date according RFC3339
 	builtBy = "unknown"   // Replaced with value from ldflag in build by GoReleaser
 )
+
+func hideConsole() {
+	getConsoleWindow := windows.NewLazyDLL("kernel32.dll").NewProc("GetConsoleWindow")
+	showWindow := windows.NewLazyDLL("user32.dll").NewProc("ShowWindow")
+	if getConsoleWindow.Find() == nil && showWindow.Find() == nil {
+		hwnd, _, _ := getConsoleWindow.Call()
+		if hwnd != 0 {
+			showWindow.Call(hwnd, 0) // SW_HIDE (0): Hides the window and activates another window.
+		}
+	}
+}
 
 func dialPipe(p string, poll bool) (*overlappedFile, error) {
 	p16, err := windows.UTF16FromString(p)
@@ -74,6 +86,10 @@ func main() {
 	if len(args) != 1 {
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *runInBackground {
+		hideConsole()
 	}
 
 	if *verbose {
