@@ -34,7 +34,10 @@ func (f *overlappedFile) getEvent() windows.Handle {
 }
 
 func (f *overlappedFile) putEvent(e windows.Handle) {
-	windows.ResetEvent(e)
+	err := windows.ResetEvent(e)
+	if err != nil {
+		panic(err)
+	}
 	f.m.Lock()
 	f.e = append(f.e, e)
 	f.m.Unlock()

@@ -1,3 +1,4 @@
+// Package main contains the npiperelay application
 package main
 
 import (
@@ -16,9 +17,9 @@ import (
 
 // How long to sleep between failures while polling
 const (
-	cSECURITY_SQOS_PRESENT = 0x100000
-	cSECURITY_ANONYMOUS    = 0
-	cPOLL_TIMEOUT          = 200 * time.Millisecond
+	cSECURITY_SQOS_PRESENT = 0x100000               //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
+	cSECURITY_ANONYMOUS    = 0                      //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
+	cPOLL_TIMEOUT          = 200 * time.Millisecond //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 )
 
 var (
@@ -35,15 +36,24 @@ var (
 	builtBy = "unknown"   // Replaced with value from ldflag in build by GoReleaser
 )
 
-func hideConsole() {
+func hideConsole() error {
 	getConsoleWindow := windows.NewLazyDLL("kernel32.dll").NewProc("GetConsoleWindow")
-	showWindow := windows.NewLazyDLL("user32.dll").NewProc("ShowWindow")
-	if getConsoleWindow.Find() == nil && showWindow.Find() == nil {
-		hwnd, _, _ := getConsoleWindow.Call()
-		if hwnd != 0 {
-			showWindow.Call(hwnd, 0) // SW_HIDE (0): Hides the window and activates another window.
-		}
+	if err := getConsoleWindow.Find(); err != nil {
+		return err
 	}
+	showWindow := windows.NewLazyDLL("user32.dll").NewProc("ShowWindow")
+	if err := showWindow.Find(); err != nil {
+		return err
+	}
+	hwnd, _, _ := getConsoleWindow.Call()
+	if hwnd == 0 {
+		return errors.New("no console associated")
+	}
+	iret, _, _ := showWindow.Call(hwnd, 0) // SW_HIDE (0): Hides the window and activates another window.
+	if iret == 0 {
+		return errors.New("console window is already hidden")
+	}
+	return nil
 }
 
 func dialPipe(p string, poll bool) (*overlappedFile, error) {
@@ -89,7 +99,9 @@ func main() {
 	}
 
 	if *runInBackground {
-		hideConsole()
+		if err := hideConsole(); err != nil {
+			log.Println("hide console window to run in background failed:", err)
+		}
 	}
 
 	if *verbose {
@@ -108,8 +120,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		_, err := io.Copy(conn, os.Stdin)
-		if err != nil {
+		if _, err := io.Copy(conn, os.Stdin); err != nil {
 			log.Fatalln("copy from stdin to pipe failed:", err)
 		}
 
@@ -122,11 +133,14 @@ func main() {
 		}
 
 		if *closeWrite {
-			// A zero-byte write on a message pipe indicates that no more data
-			// is coming.
-			conn.Write(nil)
+			// A zero-byte write on a message pipe indicates that no more data is coming.
+			if _, err := conn.Write(nil); err != nil {
+				log.Println("sending 0-byte message to the pipe after EOF on stdin failed:", err)
+			}
 		}
-		os.Stdin.Close()
+		if err := os.Stdin.Close(); err != nil {
+			log.Println("closing stdin failed:", err)
+		}
 		wg.Done()
 	}()
 
@@ -151,10 +165,11 @@ func main() {
 	}
 
 	if !*closeOnEOF {
-		os.Stdout.Close()
+		if err := os.Stdout.Close(); err != nil {
+			log.Println("closing stdout failed:", err)
+		}
 
-		// Keep reading until we get ERROR_BROKEN_PIPE or the copy from stdin
-		// finishes.
+		// Keep reading until we get ERROR_BROKEN_PIPE or the copy from stdin finishes.
 		go func() {
 			for {
 				_, err := conn.Read(nil)
