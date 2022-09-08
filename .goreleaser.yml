@@ -57,3 +57,29 @@ checksum:
 
 changelog:
   sort: asc
+
+release:
+  draft: true
+  replace_existing_draft: true
+  header: |
+    Release of the forked project, containing some improvements on top of [upstream](https://github.com/jstarks/npiperelay) release [v0.1.0](https://github.com/jstarks/npiperelay/releases/tag/v0.1.0). See release notes for the first release, [v1.0.0](https://github.com/albertony/npiperelay/releases/tag/v1.0.0), for background. Full changelog listing all commits since previous fork release further down.
+
+    <!--
+    Checksums (SHA-256):
+    - 386/x86/32-bit:
+      - npiperelay_windows_386.zip: `??`
+      - npiperelay.exe: `??`
+    - amd64/x64/64-bit:
+      - npiperelay_windows_amd64.zip: `??`
+      - npiperelay.exe: `??`
+
+    VirusTotal scan results:
+    - 386/x86/32-bit:
+      - [npiperelay_windows_386.zip](https://www.virustotal.com/gui/url/??)
+      - [npiperelay.exe](https://www.virustotal.com/gui/file/??)
+    - amd64/x64/64-bit
+      - [npiperelay_windows_amd64.zip](https://www.virustotal.com/gui/url/??)
+      - [npiperelay.exe](https://www.virustotal.com/gui/file/??)
+    -->
+
+    At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flag the zip download urls as malicious, but some do flag the executable. If this worries you, you can always check for yourself by reading through the less than 300 lines of go code, plus the single, commonly used, third party dependency, and then build from source. If your local antivirus treats the executable as suspicious or malicious, you should try to report it as a false positive, e.g. to [Symantec](https://symsubmit.symantec.com).
