@@ -17,18 +17,43 @@ builds:
     - amd64
 
 archives:
+  # Publish archived binaries (.zip).
+  # Use .zip format for Windows, instead of the default .tar.gz,
+  # and one archive for each arch (386 and amd64):
+  #    npiperelay_windows_386.zip
+  #    npiperelay_windows_amd64.zip
+  # Archives will contain the binary with name npiperelay.exe.
+  # Note: Using same name and content as the original upstream release,
+  # so they can be used as drop-in replacements.
   - id: zip
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         format: zip
+  # Publish raw binaries (.exe).
+  # One for each arch (386 and amd64):
+  #    npiperelay_windows_386.exe
+  #    npiperelay_windows_amd64.exe
+  # Redundant, since the binaries are already published in the archives, but
+  # these are convenient for direct download, while we still want the archives
+  # for backwards compatibility with the original upstream release.
+  # Note that the binary names are different from those included in the
+  # archives, which are npiperelay.exe in both cases, to get unique name
+  # for the two arch variants.
+  - id: binary
+    format: binary
+    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
-  extra_files:
-    - glob: "./dist/{{ .ProjectName }}_windows_386/{{ .ProjectName }}.exe"
-      name_template: "{{ .ProjectName }}_windows_386/{{ .ProjectName }}.exe"
-    - glob: "./dist/{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
-      name_template: "{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  # OLD: Before publishing raw binaries the following would include the checksum
+  # of the raw binaries (.exe) included in the archives (.zip). When publishing
+  # the raw binaries their checksums will already be included by default.
+  #extra_files:
+  #  - glob: "./dist/{{ .ProjectName }}_windows_386/{{ .ProjectName }}.exe"
+  #    name_template: "{{ .ProjectName }}_windows_386/{{ .ProjectName }}.exe"
+  #  - glob: "./dist/{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
+  #    name_template: "{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
 
 changelog:
   sort: asc
