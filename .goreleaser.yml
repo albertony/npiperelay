@@ -64,7 +64,9 @@ release:
   header: |
     Release of the forked project. Full changelog, listing all commits since previous fork release, at the end of this release notes.
 
-    *The forked project adds some improvements on top of [upstream](https://github.com/jstarks/npiperelay) release [v0.1.0](https://github.com/jstarks/npiperelay/releases/tag/v0.1.0). The changes are conservative; primary consern is to keep the code updated and secure, considering upstream has not been updated since the release back in mid 2020. See previous release notes for fork releases starting with [v1.0.0](https://github.com/albertony/npiperelay/releases/tag/v1.0.0) to learn about all changes.*
+    *The forked project adds some improvements on top of [upstream](/jstarks/npiperelay) release [v0.1.0](/jstarks/npiperelay/releases/tag/v0.1.0). The changes are conservative; primary consern is to keep the code updated and secure, considering upstream has not been updated since the release back in mid 2020. See previous release notes for fork releases starting with [v1.0.0](/albertony/npiperelay/releases/tag/v1.0.0) to learn about all changes.*
+
+    If your local antivirus treats the downloaded archive or executable as suspicious or malicious, you should try to report it as a false positive, e.g. to Symantec on [symsubmit.symantec.com](https://symsubmit.symantec.com). At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flag the zip download urls as malicious, but some very few do flag the executables. If this worries you, you can always check for yourself by reading through the less than 300 lines of go code, plus the single, commonly used, third party dependency, and build from source. The source code in this repository is automatically run through a long list of external code quality checks (linters), using [golangci-lint](https://golangci-lint.run/), see [.golangci.yml](/albertony/npiperelay/blob/fork/.golangci.yml) for complete list.
 
     Built with Go version {{ .Env.GOVERSION }}.
 
@@ -85,5 +87,3 @@ release:
       - [npiperelay_windows_amd64.zip](https://www.virustotal.com/gui/url/??)
       - [npiperelay.exe, npiperelay_windows_amd64.exe](https://www.virustotal.com/gui/file/??)
     -->
-
-    At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flag the zip download urls as malicious, but some do flag the executable. If this worries you, you can always check for yourself by reading through the less than 300 lines of go code, plus the single, commonly used, third party dependency, and then build from source. If your local antivirus treats the executable as suspicious or malicious, you should try to report it as a false positive, e.g. to [Symantec](https://symsubmit.symantec.com).

@@ -1,0 +1,30 @@
+linters:
+  # Disable all defaults, then enable individual linters explicitely
+  disable-all: true
+  enable:
+    # Enable the ones that are by default
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    # Enable remaining linters required to match checks performed by stand-alone staticcheck tool (corresponds to: staticcheck, stylecheck, gosimple and unused)
+    - stylecheck
+    # Add some additional linters
+    - goimports
+    - revive
+    - unconvert
+    - misspell
+    - prealloc
+
+issues:
+  # Enable some lints excluded by default
+  exclude-use-default: false
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0

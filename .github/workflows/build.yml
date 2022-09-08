@@ -1,0 +1,63 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+
+      # Install go on the runner.
+      - id: go-setup
+        name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+          check-latest: true
+
+      # Configure git to keep LF on Windows, since linters such as goimports assumes this.
+      - id: git-config
+        name: Prepare checkout
+        run: git config --global core.autocrlf false
+
+      # Checkout the source code.
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # TODO: Test that plain local build works? But golangci-lint step below does this - and more!?
+      #- id: go-build
+      #  name: Run go build
+      #  run: go build -x
+
+      # Run linting on the source code.
+      - id: go-lint
+        name: Run go lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      # If pushing v* tag: Clean workspace to remove remnants from the linter.
+      # This will remove "undefined/", which avoids goreleaser failing with:
+      #   git is currently in a dirty state
+      #   Please check in your pipeline what can be changing the following files:
+      #   ?? undefined/
+      - id: clean
+        name: Prepare go release (if pushing v-tag)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: git clean -xdf
+
+      # If pushing v* tag: Build and create release.
+      - id: go-release
+        name: Run go release (if pushing v-tag)
+        uses: goreleaser/goreleaser-action@v3
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GOVERSION: ${{ steps.go-setup.outputs.go-version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
