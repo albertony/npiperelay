@@ -55,35 +55,58 @@ checksum:
   #  - glob: "./dist/{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
   #    name_template: "{{ .ProjectName }}_windows_amd64_v1/{{ .ProjectName }}.exe"
 
-changelog:
-  sort: asc
-
 release:
   draft: true
   replace_existing_draft: true
   header: |
-    Release of the forked project. Full changelog, listing all commits since previous fork release, at the end of this release notes.
+    This is a release of my forked project, from branch [fork](https://github.com/albertony/npiperelay/tree/fork). See below for full changelog, listing all commits since previous fork release. The primary asset of the release is a direct download link for a ready-to-use build of the application's single executable, as well as an alternative .zip archive containing the same executable. It is built with Go version {{ .Env.GOVERSION }}.
 
-    *The forked project adds some improvements on top of [upstream](/jstarks/npiperelay) release [v0.1.0](/jstarks/npiperelay/releases/tag/v0.1.0). The changes are conservative; primary consern is to keep the code updated and secure, considering upstream has not been updated since the release back in mid 2020. See previous release notes for fork releases starting with [v1.0.0](/albertony/npiperelay/releases/tag/v1.0.0) to learn about all changes.*
+    <details>
+      <summary>About this fork</summary>
+    <p></p>
 
-    If your local antivirus treats the downloaded archive or executable as suspicious or malicious, you should try to report it as a false positive, e.g. to Symantec on [symsubmit.symantec.com](https://symsubmit.symantec.com). At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flag the zip download urls as malicious, but some very few do flag the executables. If this worries you, you can always check for yourself by reading through the less than 300 lines of go code, plus the single, commonly used, third party dependency, and build from source. The source code in this repository is automatically run through a long list of external code quality checks (linters), using [golangci-lint](https://golangci-lint.run/), see [.golangci.yml](/albertony/npiperelay/blob/fork/.golangci.yml) for complete list.
+    This release is from my fork of [jstarks/npiperelay](https://github.com/jstarks/npiperelay), adding some smaller improvements on top of upstream release [v0.1.0](https://github.com/jstarks/npiperelay/releases/tag/v0.1.0). The changes are conservative; primary concern is to keep the code updated and secure, considering upstream has not been updated since this first release back in mid 2020. See previous release notes for fork releases starting with [v1.0.0](https://github.com/albertony/npiperelay/releases/tag/v1.0.0) to learn about all changes.
+    </details>
 
-    Built with Go version {{ .Env.GOVERSION }}.
+    <details>
+      <summary>Checksums</summary>
+    <p></p>
+
+    Below are the SHA-256 checksums of release assets, the same that you can find in text file asset `npiperelay_checksums.txt`. Note that the .zip asset for the amd64 (x64, 64-bit) and 386 (x86, 32-bit) architectures both contain a single executable with name `npiperelay.exe`, and it is identical to the .exe asset with same name as the .zip asset, i.e. `npiperelay_windows_386.exe` and `npiperelay_windows_amd64.exe`, and should therefore have same checksums.
+    <!--
+    ```
+    *** TODO: Copy content of npiperelay_checksums.txt here! ***
+    ```
+    -->
+    </details>
+
+    <details>
+      <summary>Antivirus</summary>
+    <p></p>
+
+    If your local antivirus treats the downloaded archive or executable as suspicious or malicious, you should try to report it as a false positive, e.g. to Symantec on [symsubmit.symantec.com](https://symsubmit.symantec.com) (select "Clean software incorrectly detected"). At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flagged the asset download urls as malicious, but some very few (well below 10%) did flag the zip archive and executable files themselves (see report for each of the assets in expandable section below). The implementation is less than 300 lines of go code, plus a single, commonly used, third party dependency, and it is automatically run through a long list of external code quality checks (linters), using [golangci-lint](https://golangci-lint.run/) (see [.golangci.yml](https://github.com/albertony/npiperelay/blob/fork/.golangci.yml) for the complete list). If you do worry, you are free to analyse the code yourself, and you can also [build](https://github.com/albertony/npiperelay#building) the executable locally from source.
+    <!--
+    *** TODO: Analyse asset urls and files and update report links below! ***
+    [VirusTotal](https://www.virustotal.com/) scan reports for release assets:
+    - Asset download URLs:
+      - npiperelay_windows_386.zip: [Report](https://www.virustotal.com/gui/url/??)
+      - npiperelay_windows_386.exe: [Report](https://www.virustotal.com/gui/url/??)
+      - npiperelay_windows_amd64.zip: [Report](https://www.virustotal.com/gui/url/??)
+      - npiperelay_windows_amd64.exe: [Report](https://www.virustotal.com/gui/url/??)
+    - Asset files:
+      - npiperelay_windows_386.zip: [Report](https://www.virustotal.com/gui/file/??)
+      - npiperelay_windows_386.exe and npiperelay.exe from npiperelay_windows_386.zip: [Report](https://www.virustotal.com/gui/file/??)
+      - npiperelay_windows_amd64.zip: [Report](https://www.virustotal.com/gui/file/??)
+      - npiperelay_windows_amd64.exe and npiperelay.exe from npiperelay_windows_amd64.zip: [Report](https://www.virustotal.com/gui/file/??)
+    </details>
+    -->
 
     <!--
-    Checksums (SHA-256):
-    - 386/x86/32-bit:
-      - npiperelay_windows_386.zip: `??`
-      - npiperelay.exe, npiperelay_windows_386.exe: `??`
-    - amd64/x64/64-bit:
-      - npiperelay_windows_amd64.zip: `??`
-      - npiperelay.exe, npiperelay_windows_amd64.exe: `??`
+    <details>
+      <summary>Changelog</summary>
+    <p></p>
 
-    VirusTotal scan results:
-    - 386/x86/32-bit:
-      - [npiperelay_windows_386.zip](https://www.virustotal.com/gui/url/??)
-      - [npiperelay.exe, npiperelay_windows_386.exe](https://www.virustotal.com/gui/file/??)
-    - amd64/x64/64-bit
-      - [npiperelay_windows_amd64.zip](https://www.virustotal.com/gui/url/??)
-      - [npiperelay.exe, npiperelay_windows_amd64.exe](https://www.virustotal.com/gui/file/??)
+    Commits since previous fork release:
+    *** TODO: Move goreleaser autogenerated changelog in here! ***
+    </details>
     -->
