@@ -40,6 +40,15 @@ jobs:
         with:
           version: latest
 
+      # Run vulnerability analysis on the source code.
+      # Currently manual install and execution, not using separate action.
+      - id: get-govulncheck
+        name: Get govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - id: run-govulncheck
+        name: Run govulncheck
+        run: govulncheck ./...
+
       # If pushing v* tag: Clean workspace to remove remnants from the linter.
       # This will remove "undefined/", which avoids goreleaser failing with:
       #   git is currently in a dirty state
