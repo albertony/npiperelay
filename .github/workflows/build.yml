@@ -62,7 +62,7 @@ jobs:
       # If pushing v* tag: Build and create release.
       - id: go-release
         name: Run go release (if pushing v-tag)
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         with:
           version: latest
