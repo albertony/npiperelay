@@ -13,8 +13,7 @@ jobs:
         name: Setup go
         uses: actions/setup-go@v3
         with:
-          # Note: Using "go-version: 1.20" incorrectly matches with go version 1.2 (see https://github.com/actions/setup-go/issues/326)
-          go-version: 1.20.*
+          go-version: '1.20' # Quoted, because "go-version: 1.20" would be treated as go version 1.2.
           check-latest: true
 
       # Configure git to keep LF on Windows, since linters such as goimports assumes this.
