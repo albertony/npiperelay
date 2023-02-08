@@ -1,7 +1,25 @@
 name: Build
 
-on: push
-
+on:
+  # Run automatically when pushing a commit or tag.
+  push:
+  # Support manually running the workflow.
+  workflow_dispatch:
+    # Configurable input properties when running manually.
+    inputs:
+      # Option to run go-releaser, by default publishing a (draft) release from latest tag.
+      release:
+        description: Run GoReleaser step
+        type: boolean
+        required: true
+        default: false
+      # Additional option, when option release is true, to run as snapshot build from
+      # latest commit instead of latest tag and without publishing as a release.
+      snapshot:
+        description: GoReleaser Snapshot mode (latest commit, no publishing)
+        type: boolean
+        required: true
+        default: false
 jobs:
   build:
     name: Build
@@ -49,24 +67,38 @@ jobs:
         name: Run govulncheck
         run: govulncheck ./...
 
-      # If pushing v* tag: Clean workspace to remove remnants from the linter.
-      # This will remove "undefined/", which avoids goreleaser failing with:
+      # If pushing v* tag, or manual run with option release: Clean workspace to remove remnants from the linter.
+      # This will remove "undefined/", which avoids go-release failing with:
       #   git is currently in a dirty state
       #   Please check in your pipeline what can be changing the following files:
       #   ?? undefined/
       - id: clean
-        name: Prepare go release (if pushing v-tag)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        name: Prepare go release (if pushing v-tag or triggered manually)
+        if: github.event.inputs.release == 'true' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         run: git clean -xdf
 
-      # If pushing v* tag: Build and create release.
-      - id: go-release
-        name: Run go release (if pushing v-tag)
+      # If pushing v* tag, or manual run with option "release" but not "snapshot": Build and create release from latest tag.
+      # Note: If manual run it must be on the tag (same commit), or else go-releaser will fail with: "git tag <tag_name> was not made against commit <commit_hash>",
+      # and one must consider using the snapshot mode instead (see below).
+      - id: go-release-tag
+        name: Run go release tag (if pushing v-tag or triggered manually)
         uses: goreleaser/goreleaser-action@v4
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        if: (github.event.inputs.release == 'true' && github.event.inputs.snapshot != 'true') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
+        env:
+          GOVERSION: ${{ steps.go-setup.outputs.go-version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # If manual run with options "release" and "snapshot": Build latest commit without publishing a release.
+      - id: go-release-snapshot
+        name: Run go release snapshot (if triggered manually)
+        uses: goreleaser/goreleaser-action@v4
+        if: github.event.inputs.release == 'true' && github.event.inputs.snapshot == 'true'
+        with:
+          version: latest
+          args: release --clean --snapshot
         env:
           GOVERSION: ${{ steps.go-setup.outputs.go-version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

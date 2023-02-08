@@ -72,8 +72,10 @@ release:
       <summary>Checksums</summary>
     <p></p>
 
-    Below are the SHA-256 checksums of release assets, the same that you can find in text file asset `npiperelay_checksums.txt`. Note that the .zip asset for the amd64 (x64, 64-bit) and 386 (x86, 32-bit) architectures both contain a single executable with name `npiperelay.exe`, and it is identical to the .exe asset with same name as the .zip asset, i.e. `npiperelay_windows_386.exe` and `npiperelay_windows_amd64.exe`, and should therefore have same checksums.
+    The SHA-256 checksums of the binary release assets are published as text file asset `npiperelay_checksums.txt`. Note that the .zip asset for the amd64 (x64/64-bit) and 386 (x86/32-bit) architectures both contain a single executable with name `npiperelay.exe`, and it is identical to the .exe asset with same name as the .zip asset, i.e. `npiperelay_windows_386.exe` and `npiperelay_windows_amd64.exe`, and should therefore have the same checksum.
     <!--
+
+    These are the SHA-256 checksums of all binary release assets, as published in `npiperelay_checksums.txt`:
     ```
     *** TODO: Copy content of npiperelay_checksums.txt here! ***
     ```
@@ -86,7 +88,8 @@ release:
 
     If your local antivirus treats the downloaded archive or executable as suspicious or malicious, you should try to report it as a false positive, e.g. to Symantec on [symsubmit.symantec.com](https://symsubmit.symantec.com) (select "Clean software incorrectly detected"). At the time of the release, no security vendors on [VirusTotal](https://www.virustotal.com) flagged the asset download urls as malicious, but some very few (well below 10%) did flag the zip archive and executable files themselves (see report for each of the assets in expandable section below). The implementation is less than 300 lines of go code, plus a single, commonly used, third party dependency. The source code is automatically run through a vulnerability analysis, using [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck), and a long list of code quality checks (linters), using [golangci-lint](https://golangci-lint.run/) (see [.golangci.yml](https://github.com/albertony/npiperelay/blob/fork/.golangci.yml) for the complete list). If you do worry, you are free to analyse the code yourself, and you can also [build](https://github.com/albertony/npiperelay#building) the executable locally from source.
     <!--
-    *** TODO: Analyse asset urls and files and update report links below! ***
+
+    *** TODO: Analyze asset urls and files, and update report links below! ***
     [VirusTotal](https://www.virustotal.com/) scan reports for release assets:
     - Asset download URLs:
       - npiperelay_windows_386.zip: [Report](https://www.virustotal.com/gui/url/??)
