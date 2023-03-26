@@ -41,7 +41,7 @@ jobs:
       # Install go on the runner.
       - id: go-setup
         name: Setup go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: '1.20' # Quoted, because "go-version: 1.20" would be treated as go version 1.2.
           check-latest: true
