@@ -44,7 +44,8 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.20' # Quoted, because "go-version: 1.20" would be treated as go version 1.2.
-          check-latest: true
+          check-latest: true # Don't use a locally cached version of Go without first checking if it is up-to-date.
+          cache: false # Don't cache go modules and build output, let golangci-lint-action do that instead.
 
       # TODO: Test that plain local build works? But golangci-lint step below does this - and more!?
       #- id: go-build
