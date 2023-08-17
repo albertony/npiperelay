@@ -35,8 +35,6 @@ jobs:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       # Install go on the runner.
       - id: go-setup
