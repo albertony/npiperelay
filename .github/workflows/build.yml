@@ -3,6 +3,11 @@ name: Build
 on:
   # Run automatically when pushing a commit or tag.
   push:
+  # Run automatically once a week (at 05:30 on fridays)
+  # to check against any updated vulnerability information
+  # regardless if our own code has changed.
+  schedule:
+    - cron: '30 5 * * 5'
   # Support manually running the workflow.
   workflow_dispatch:
     # Configurable input properties when running manually.
