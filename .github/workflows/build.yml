@@ -20,6 +20,7 @@ on:
         type: boolean
         required: true
         default: false
+
 jobs:
   build:
     name: Build
@@ -28,43 +29,63 @@ jobs:
 
       # Configure git to keep LF on Windows, since linters such as goimports assumes this.
       - id: git-config
-        name: Prepare checkout
+        name: Configure git
         run: git config --global core.autocrlf false
 
       # Checkout the source code.
-      - id: checkout
-        name: Checkout
+      - id: git-checkout
+        name: Checkout source
         uses: actions/checkout@v3
 
       # Install go on the runner.
       - id: go-setup
-        name: Setup go
+        name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
           check-latest: true # Don't use a locally cached version of Go without first checking if it is up-to-date.
-          cache: false # Don't cache go modules and build output, let golangci-lint-action do that instead.
 
-      # TODO: Test that plain local build works? But golangci-lint step below does this - and more!?
-      #- id: go-build
-      #  name: Run go build
-      #  run: go build -x
-
-      # Run linting on the source code.
-      - id: go-lint
-        name: Run go lint
-        uses: golangci/golangci-lint-action@v3
+      # Initialize CodeQL (GitHub vulnerability analysis).
+      - id: codeql-init
+        name: Setup CodeQL
+        uses: github/codeql-action/init@v2
         with:
-          version: latest
+          languages: go
 
-      # Run vulnerability analysis on the source code.
+      # Build.
+      # The golangci-lint step will implicitely build the code, and if creating
+      # a release goreleaser will do it as well, but here we do an explicit build
+      # required for CodeQL while its indirect build tracing is active.
+      - id: go-build
+        name: Build source
+        run: go build -x ./...
+
+      # Run CodeQL analysis.
+      # This finalizes the database and ends tracing (but note that trace-related
+      # environment variables will still be left behind, see
+      # https://github.com/github/codeql-action/blob/e683046da183a09174d531cc43713853e27debb3/src/analyze.ts#L583-L588).
+      - id: codeql-analyze
+        name: Run CodeQL
+        uses: github/codeql-action/analyze@v2
+
+      # Run govulncheck (Go vulnerability analysis).
       # Currently manual install and execution, not using separate action.
       - id: get-govulncheck
-        name: Get govulncheck
+        name: Setup govulncheck
         run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
       - id: run-govulncheck
         name: Run govulncheck
         run: govulncheck ./...
+
+      # Run linting on the source code.
+      - id: go-lint
+        name: Run linting
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          skip-pkg-cache: false # Don't cache go modules, let setup-go do that.
+          skip-build-cache: false # Don't cache build output, let setup-go do that.
 
       # If pushing v* tag, or manual run with option release: Clean workspace to remove remnants from the linter.
       # This will remove "undefined/", which avoids go-release failing with:
@@ -72,7 +93,7 @@ jobs:
       #   Please check in your pipeline what can be changing the following files:
       #   ?? undefined/
       - id: clean
-        name: Prepare go release (if pushing v-tag or triggered manually)
+        name: Clean before go release (if pushing v-tag or triggered manually)
         if: github.event.inputs.release == 'true' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         run: git clean -xdf
 
