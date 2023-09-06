@@ -40,7 +40,9 @@ jobs:
       # Checkout the source code.
       - id: git-checkout
         name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
 
       # Install go on the runner.
       - id: go-setup
