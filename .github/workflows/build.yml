@@ -53,8 +53,12 @@ jobs:
           check-latest: true # Don't use a locally cached version of Go without first checking if it is up-to-date.
 
       # Initialize CodeQL (GitHub vulnerability analysis).
+      # NOTE: Skipping (this and all other CodeQL related) if running Dependabot PR,
+      # since it runs with read-only token by default and therefore the Post Setup CodeQL
+      # will produce error when trying to upload code scanning results
       - id: codeql-init
         name: Setup CodeQL
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: github/codeql-action/init@v2
         with:
           languages: go
@@ -65,6 +69,7 @@ jobs:
       # required for CodeQL while its indirect build tracing is active.
       - id: go-build
         name: Build source
+        if: ${{ github.actor != 'dependabot[bot]' }}
         run: go build -x ./...
 
       # Run CodeQL analysis.
@@ -73,6 +78,7 @@ jobs:
       # https://github.com/github/codeql-action/blob/e683046da183a09174d531cc43713853e27debb3/src/analyze.ts#L583-L588).
       - id: codeql-analyze
         name: Run CodeQL
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: github/codeql-action/analyze@v2
 
       # Run govulncheck (Go vulnerability analysis).
