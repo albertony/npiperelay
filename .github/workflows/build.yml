@@ -115,7 +115,7 @@ jobs:
       # and one must consider using the snapshot mode instead (see below).
       - id: go-release-tag
         name: Run go release tag (if pushing v-tag or triggered manually)
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: (github.event.inputs.release == 'true' && github.event.inputs.snapshot != 'true') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         with:
           version: latest
@@ -127,7 +127,7 @@ jobs:
       # If manual run with options "release" and "snapshot": Build latest commit without publishing a release.
       - id: go-release-snapshot
         name: Run go release snapshot (if triggered manually)
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: github.event.inputs.release == 'true' && github.event.inputs.snapshot == 'true'
         with:
           version: latest
