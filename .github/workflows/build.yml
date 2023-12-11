@@ -48,7 +48,7 @@ jobs:
       # Install go on the runner.
       - id: go-setup
         name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           check-latest: true # Don't use a locally cached version of Go without first checking if it is up-to-date.
