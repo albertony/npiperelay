@@ -60,7 +60,7 @@ jobs:
       - id: codeql-init
         name: Setup CodeQL
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: go
 
@@ -80,7 +80,7 @@ jobs:
       - id: codeql-analyze
         name: Run CodeQL
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
 
       # Run govulncheck (Go vulnerability analysis).
       # Currently manual install and execution, not using separate action.
