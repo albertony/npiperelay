@@ -1,5 +1,5 @@
 module github.com/albertony/npiperelay
 
-go 1.21
+go 1.22
 
 require golang.org/x/sys v0.16.0
