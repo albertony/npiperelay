@@ -22,7 +22,6 @@ const (
 	cSECURITY_SQOS_PRESENT = 0x100000               //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 	cSECURITY_ANONYMOUS    = 0                      //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 	cPOLL_TIMEOUT          = 200 * time.Millisecond //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
-        pollTimeout = 200 * time.Millisecond
 )
 
 var (
@@ -84,9 +83,9 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 	}
 }
 
-func dialPort(p int, poll bool) (*overlappedFile, error) {
+func dialPort(p int, _ bool) (*overlappedFile, error) {
 	if p < 0 || p > 65535 {
-		return nil, errors.New("Invalid port value")
+		return nil, errors.New("invalid port value")
 	}
 
 	h, err := windows.Socket(windows.AF_INET, windows.SOCK_STREAM, 0)
@@ -107,7 +106,7 @@ func dialPort(p int, poll bool) (*overlappedFile, error) {
 	conn := newOverlappedFile(h)
 
 	// Connect to the LibAssuan socket using overlapped ConnectEx operation
-	_, err = conn.asyncIo(func(h windows.Handle, n *uint32, o *windows.Overlapped) error {
+	_, err = conn.asyncIo(func(h windows.Handle, _ *uint32, o *windows.Overlapped) error {
 		return windows.ConnectEx(h, sa, nil, 0, nil, o)
 	})
 	if err != nil {
@@ -153,14 +152,17 @@ func dialAssuan(p string, poll bool) (*overlappedFile, error) {
 		log.Printf("Port: %d, Nonce: %X", port, nonce)
 	}
 
-	pipeConn.Close()
+	err = pipeConn.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	for {
 		// Try to connect to the libassaun TCP socket hosted on localhost
 		conn, err := dialPort(port, poll)
 
 		if poll && (err == windows.WSAETIMEDOUT || err == windows.WSAECONNREFUSED || err == windows.WSAENETUNREACH || err == windows.ERROR_CONNECTION_REFUSED) {
-			time.Sleep(pollTimeout)
+			time.Sleep(cPOLL_TIMEOUT)
 			continue
 		}
 
