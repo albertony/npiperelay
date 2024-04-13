@@ -8,7 +8,6 @@ linters:
     - govet
     - ineffassign
     - staticcheck
-    - typecheck
     - unused
     # Enable remaining linters required to match checks performed by stand-alone staticcheck tool (corresponds to: staticcheck, stylecheck, gosimple and unused)
     - stylecheck
