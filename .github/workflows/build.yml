@@ -95,11 +95,9 @@ jobs:
       # Run linting on the source code.
       - id: go-lint
         name: Run linting
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v5
         with:
           version: latest
-          skip-pkg-cache: true # Don't cache go modules, let setup-go do that.
-          skip-build-cache: true # Don't cache build output, let setup-go do that.
 
       # If pushing v* tag, or manual run with option release: Clean workspace to remove remnants from the linter.
       # This will remove "undefined/", which avoids go-release failing with:
