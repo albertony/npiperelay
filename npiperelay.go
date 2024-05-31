@@ -83,12 +83,16 @@ func dialPipe(p string, poll bool) (*overlappedFile, error) {
 func main() {
 	flag.Usage = func() {
 		// Custom usage message (default documented here: https://pkg.go.dev/flag#pkg-variables)
-		fmt.Fprintf(flag.CommandLine.Output(), "npiperelay v%s\n", version)
-		fmt.Fprintf(flag.CommandLine.Output(), "  commit %s\n", commit)
-		fmt.Fprintf(flag.CommandLine.Output(), "  build date %s\n", date)
-		fmt.Fprintf(flag.CommandLine.Output(), "  built by %s\n", builtBy)
-		fmt.Fprintf(flag.CommandLine.Output(), "  built with %s\n", runtime.Version())
-		fmt.Fprint(flag.CommandLine.Output(), "\nusage:\n")
+		if _, err := fmt.Fprintf(flag.CommandLine.Output(),
+			"npiperelay v%s\n"+
+				"  commit %s\n"+
+				"  build date %s\n"+
+				"  built by %s\n"+
+				"  built with %s\n"+
+				"\nusage:\n",
+			version, commit, date, builtBy, runtime.Version()); err != nil {
+			log.Fatalln(err)
+		}
 		flag.PrintDefaults()
 	}
 	flag.Parse()
