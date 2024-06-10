@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - 'go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest'
