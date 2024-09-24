@@ -106,7 +106,7 @@ jobs:
       #   ?? undefined/
       - id: clean
         name: Clean before go release (if pushing v-tag or triggered manually)
-        if: github.event.inputs.release == 'true' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+        if: inputs.release || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         run: git clean -xdf
 
       # If pushing v* tag, or manual run with option "release" but not "snapshot": Build and create release from latest tag.
@@ -115,7 +115,7 @@ jobs:
       - id: go-release-tag
         name: Run go release tag (if pushing v-tag or triggered manually)
         uses: goreleaser/goreleaser-action@v6
-        if: (github.event.inputs.release == 'true' && github.event.inputs.snapshot != 'true') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+        if: (inputs.release && !inputs.snapshot) || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
         with:
           version: latest
           args: release --clean
@@ -127,7 +127,7 @@ jobs:
       - id: go-release-snapshot
         name: Run go release snapshot (if triggered manually)
         uses: goreleaser/goreleaser-action@v6
-        if: github.event.inputs.release == 'true' && github.event.inputs.snapshot == 'true'
+        if: inputs.release && inputs.snapshot
         with:
           version: latest
           args: release --clean --snapshot
