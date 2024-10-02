@@ -16,15 +16,11 @@ on:
       release:
         description: Run GoReleaser step
         type: boolean
-        required: true
-        default: false
       # Additional option, when option release is true, to run as snapshot build from
       # latest commit instead of latest tag and without publishing as a release.
       snapshot:
         description: GoReleaser Snapshot mode (latest commit, no publishing)
         type: boolean
-        required: true
-        default: false
 
 jobs:
   build:
