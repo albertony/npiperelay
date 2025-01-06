@@ -37,11 +37,11 @@ var (
 )
 
 func hideConsole() error {
-	getConsoleWindow := windows.NewLazyDLL("kernel32.dll").NewProc("GetConsoleWindow")
+	getConsoleWindow := windows.NewLazySystemDLL("kernel32.dll").NewProc("GetConsoleWindow")
 	if err := getConsoleWindow.Find(); err != nil {
 		return err
 	}
-	showWindow := windows.NewLazyDLL("user32.dll").NewProc("ShowWindow")
+	showWindow := windows.NewLazySystemDLL("user32.dll").NewProc("ShowWindow")
 	if err := showWindow.Find(); err != nil {
 		return err
 	}
