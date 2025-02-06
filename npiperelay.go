@@ -30,7 +30,7 @@ var (
 	closeOnEOF      = flag.Bool("ep", false, "terminate on EOF reading from the pipe, even if there is more data to write")
 	closeOnStdinEOF = flag.Bool("ei", false, "terminate on EOF reading from stdin, even if there is more data to write")
 	runInBackground = flag.Bool("bg", false, "hide console window and run in background")
-	assuan          = flag.Bool("a", false, "treat the target as a libassuan file socket (Used by GnuPG)")
+	assuan          = flag.Bool("a", false, "treat the target as an Assuan file socket (used by GnuPG)")
 	verbose         = flag.Bool("v", false, "verbose output on stderr")
 
 	version = "0.0.0-dev" // Replaced with value from ldflag in build by GoReleaser: Current Git tag with the v prefix stripped
@@ -105,7 +105,7 @@ func dialPort(p int, _ bool) (*overlappedFile, error) {
 	// Wrap our socket up to be properly handled
 	conn := newOverlappedFile(h)
 
-	// Connect to the LibAssuan socket using overlapped ConnectEx operation
+	// Connect to the Assuan TCP port using overlapped ConnectEx operation
 	_, err = conn.asyncIo(func(h windows.Handle, _ *uint32, o *windows.Overlapped) error {
 		return windows.ConnectEx(h, sa, nil, 0, nil, o)
 	})
@@ -158,7 +158,7 @@ func dialAssuan(p string, poll bool) (*overlappedFile, error) {
 	}
 
 	for {
-		// Try to connect to the libassaun TCP socket hosted on localhost
+		// Try to connect to the Assuan TCP socket hosted on localhost
 		conn, err := dialPort(port, poll)
 
 		if poll && (err == windows.WSAETIMEDOUT || err == windows.WSAECONNREFUSED || err == windows.WSAENETUNREACH || err == windows.ERROR_CONNECTION_REFUSED) {
@@ -178,13 +178,6 @@ func dialAssuan(p string, poll bool) (*overlappedFile, error) {
 
 		return conn, nil
 	}
-}
-
-func underlyingError(err error) error {
-	if serr, ok := err.(*os.SyscallError); ok {
-		return serr.Err
-	}
-	return err
 }
 
 func main() {
@@ -263,7 +256,7 @@ func main() {
 	}()
 
 	_, err = io.Copy(os.Stdout, conn)
-	if underlyingError(err) == windows.ERROR_BROKEN_PIPE || underlyingError(err) == windows.ERROR_PIPE_NOT_CONNECTED {
+	if errors.Is(err, windows.ERROR_BROKEN_PIPE) || errors.Is(err, windows.ERROR_PIPE_NOT_CONNECTED) {
 		// The named pipe is closed and there is no more data to read. Since
 		// named pipes are not bidirectional, there is no way for the other side
 		// of the pipe to get more data, so do not wait for the stdin copy to
