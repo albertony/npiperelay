@@ -22,10 +22,12 @@ const (
 	cSECURITY_SQOS_PRESENT = 0x100000               //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 	cSECURITY_ANONYMOUS    = 0                      //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 	cPOLL_TIMEOUT          = 200 * time.Millisecond //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
+	cPOLL_ATTEMPTS         = 300                    //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
 )
 
 var (
-	poll            = flag.Bool("p", false, "poll until the the named pipe exists and is not busy")
+	poll            = flag.Bool("p", false, "poll every 200ms until the the named pipe exists and is not busy")
+	limit           = flag.Bool("l", false, "when polling do not poll indefinitely, fail after 300 attempts")
 	closeWrite      = flag.Bool("s", false, "send a 0-byte message to the pipe after EOF on stdin")
 	closeOnEOF      = flag.Bool("ep", false, "terminate on EOF reading from the pipe, even if there is more data to write")
 	closeOnStdinEOF = flag.Bool("ei", false, "terminate on EOF reading from stdin, even if there is more data to write")
@@ -59,17 +61,20 @@ func hideConsole() error {
 	return nil
 }
 
-func dialPipe(p string, poll bool) (*overlappedFile, error) {
+func dialPipe(p string, poll bool, limit bool) (*overlappedFile, error) {
 	p16, err := windows.UTF16FromString(p)
 	if err != nil {
 		return nil, err
 	}
-	for {
+	for attempts := 0; ; {
 		h, err := windows.CreateFile(&p16[0], windows.GENERIC_READ|windows.GENERIC_WRITE, 0, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_OVERLAPPED|cSECURITY_SQOS_PRESENT|cSECURITY_ANONYMOUS, 0)
 		if err == nil {
 			return newOverlappedFile(h), nil
 		}
-		if poll {
+		if poll && attempts < cPOLL_ATTEMPTS {
+			if limit {
+				attempts++
+			}
 			if err == windows.ERROR_FILE_NOT_FOUND {
 				time.Sleep(cPOLL_TIMEOUT)
 				continue
@@ -117,8 +122,8 @@ func dialPort(p int, _ bool) (*overlappedFile, error) {
 }
 
 // LibAssaun file socket: Attempt to read contents of the target file and connect to a TCP port
-func dialAssuan(p string, poll bool) (*overlappedFile, error) {
-	pipeConn, err := dialPipe(p, poll)
+func dialAssuan(p string, poll bool, limit bool) (*overlappedFile, error) {
+	pipeConn, err := dialPipe(p, poll, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -216,9 +221,9 @@ func main() {
 	var err error
 
 	if !*assuan {
-		conn, err = dialPipe(args[0], *poll)
+		conn, err = dialPipe(args[0], *poll, *limit)
 	} else {
-		conn, err = dialAssuan(args[0], *poll)
+		conn, err = dialAssuan(args[0], *poll, *limit)
 	}
 	if err != nil {
 		log.Fatalln(err)
