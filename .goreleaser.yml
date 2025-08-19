@@ -74,7 +74,7 @@ release:
       <summary>Checksums</summary>
     <p></p>
 
-    GitHub automatically computes SHA-256 checksums for all release assets, which you can see to the right of the asset names in the "Assets" section below. These are generated at upload time and are immutable. The build system also computes SHA-256 checksums of built executables, and these published as text file asset `npiperelay_checksums.txt`. Note that the .zip asset for the amd64 (x64/64-bit) and 386 (x86/32-bit) architectures both contain a single executable with name `npiperelay.exe`, and it is identical to the .exe asset with same name as the .zip asset, i.e. `npiperelay_windows_386.exe` and `npiperelay_windows_amd64.exe`, and should therefore have the same checksum.
+    GitHub automatically computes SHA-256 checksums for all release assets, which you can see to the right of the asset names in the "Assets" section below. These are generated at upload time and are immutable. The build system also computes SHA-256 checksums of built executables, and these are published as text file asset `npiperelay_checksums.txt`. Note that the .zip asset for the amd64 (x64/64-bit) and 386 (x86/32-bit) architectures both contain a single executable with name `npiperelay.exe`, and it is identical to the .exe asset with same name as the .zip asset, i.e. `npiperelay_windows_386.exe` and `npiperelay_windows_amd64.exe`, and should therefore have the same checksum.
     <!--
 
     These are the SHA-256 checksums of all binary release assets, as published in `npiperelay_checksums.txt`:
