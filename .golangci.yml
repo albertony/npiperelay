@@ -1,16 +1,18 @@
 version: "2"
 
 linters:
-  # Disable all linters by default, then enable individual linters explicitly.
+  # Configure the linter set. To avoid unexpected results the implicit default
+  # set is ignored and all the ones to use are explicitly enabled.
   default: none
   enable:
-    # Enable the ones that are by default.
+    # Default
     - errcheck
     - govet
     - ineffassign
     - staticcheck
     - unused
-    # Add some additional linters
+    # Additional
+    - gocritic
     - misspell
     - prealloc
     - revive
