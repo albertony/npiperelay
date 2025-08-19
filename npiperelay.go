@@ -19,10 +19,10 @@ import (
 
 // How long to sleep between failures while polling
 const (
-	cSECURITY_SQOS_PRESENT = 0x100000               //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
-	cSECURITY_ANONYMOUS    = 0                      //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
-	cPOLL_TIMEOUT          = 200 * time.Millisecond //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
-	cPOLL_ATTEMPTS         = 300                    //nolint:revive,stylecheck // Don't include revive and stylecheck when running golangci-lint to stop complain about use of underscores in Go names
+	cSECURITY_SQOS_PRESENT = 0x100000               //nolint:revive // Don't include revive when running golangci-lint to stop complain about use of underscores in Go names
+	cSECURITY_ANONYMOUS    = 0                      //nolint:revive // Don't include revive when running golangci-lint to stop complain about use of underscores in Go names
+	cPOLL_TIMEOUT          = 200 * time.Millisecond //nolint:revive // Don't include revive when running golangci-lint to stop complain about use of underscores in Go names
+	cPOLL_ATTEMPTS         = 300                    //nolint:revive // Don't include revive when running golangci-lint to stop complain about use of underscores in Go names
 )
 
 var (
