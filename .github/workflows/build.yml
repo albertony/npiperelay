@@ -91,7 +91,7 @@ jobs:
       # Run linting on the source code.
       - id: go-lint
         name: Run linting
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
 
