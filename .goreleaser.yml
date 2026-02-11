@@ -31,7 +31,7 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
-        format: zip
+        formats: zip
   # Publish raw binaries (.exe).
   # One for each arch (386 and amd64):
   #    npiperelay_windows_386.exe
@@ -43,7 +43,7 @@ archives:
   # archives, which are npiperelay.exe in both cases, to get unique name
   # for the two arch variants.
   - id: binary
-    format: binary
+    formats: binary
     name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
